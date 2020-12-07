@@ -135,6 +135,7 @@ function Platillos() {
           <TouchableHighlight key={p.CategoriaId} onPress={() => Platillos()}>
             <View>
               <Text style={estilos.texto}> {p.Nombre}</Text>
+              <Text style={estilos.texto}> {p.Fecha}</Text>
               <AntDesign name="right" size={23} color="#0a84ff" />
             </View>
           </TouchableHighlight>
@@ -152,11 +153,48 @@ function ListadoPlatillos() {
     </View>
   );
 }
+
+function Categoria() {
+  const [Nombre, setNombre] = useState("");
+  function AgregarCat()
+  {
+    fetch("http://localhost:3000/categoriapost", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        Nombre: Nombre,
+      }),
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        console.log(res);
+        alert('Se ha creado una nueva categoria');
+        //window.location.reload();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  return (
+    <View style={estilos.container}>
+      <Text style={estilos.texto1}>
+        Nueva categoria
+      </Text>
+      <TextInput
+        placeholder="Nombre de la categoria"
+        onChangeText={(n) => setNombre(n)}
+        style={estilos.input}
+      ></TextInput>
+      <Button onPress={() => AgregarCat()} title="Añadir" />
+    </View>
+  );
+}
 function PantallaDos() {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Crear Usuario" component={RegistroScreen} />
-      <Tab.Screen name="Categorias" component={listado} />
+      <Tab.Screen name="Ver Categorias" component={listado} />
+        <Tab.Screen name="Crear Categoria" component={Categoria} />
         <Tab.Screen name="Crear Platillos" component={listado} />
     </Tab.Navigator>
   );
