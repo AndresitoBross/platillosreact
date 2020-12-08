@@ -17,189 +17,205 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AntDesign } from "@expo/vector-icons";
 //import * as ImagePicker from 'expo-image-picker'
 //import * as Permissions from 'expo-permissions'
-function PostScreen({ navigation }) {
-  const [Nombre, setNombre] = useState("");
-  const [Password, setPassword] = useState("");
-  function Login() {
-    //AGREGO EN BASE DE DATOS
-    fetch("http://localhost:3000/user", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        Nombre: Nombre,
-        Password: Password,
-      }),
-    })
-      .then((res) => res.text())
-      .then((res) => {
-        console.log(res);
-        //console.log(typeof(res),res.length);
-        if (res.length == 2) {
-          alert("Usuario o contraseña no existen");
-        } else {
-          alert("Te haz logueado exitosamente");
-          navigation.navigate("Bienvenidos");
-        }
+localStorage.clear();
 
-        //window.location.reload();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-  return (
-    <View style={estilos.container}>
-      <Text style={estilos.texto1}>Login</Text>
-      <TextInput
-        placeholder="Username"
-        onChangeText={(n) => setNombre(n)}
-        style={estilos.input}
-      ></TextInput>
-      <TextInput
-        placeholder="Password"
-        onChangeText={(a) => setPassword(a)}
-        style={estilos.input}
-      ></TextInput>
-      <Button onPress={() => Login()} title="Logueo" />
-    </View>
-  );
-}
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
-function RegistroScreen() {
-  const [Nombre, setNombre] = useState("");
-  const [Password, setPassword] = useState("");
-  function Registro() {
-    //AGREGO EN BASE DE DATOS
-    fetch("http://localhost:3000/registro", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        Nombre: Nombre,
-        Password: Password,
-      }),
-    })
-      .then((res) => res.text())
-      .then((res) => {
-        console.log(res);
-        alert("Usuario agregado exitosamente");
-        //window.location.reload();
-      })
-      .catch((error) => console.logl(error));
-  }
-  return (
-    <View style={estilos.container}>
-      <Text style={estilos.texto1}>Registro</Text>
-      <Text style={estilos.texto1}>
-        Unicamente cree su usuario y contraseña
-      </Text>
-      <TextInput
-        placeholder="Username"
-        onChangeText={(n) => setNombre(n)}
-        style={estilos.input}
-      ></TextInput>
-      <TextInput
-        placeholder="Password"
-        onChangeText={(a) => setPassword(a)}
-        style={estilos.input}
-      ></TextInput>
-      <Button onPress={() => Registro()} title="Registro" />
-    </View>
-  );
-}
-
-
-function listado({navigation}) {
-  const [categoria, setCategoria] = useState([]);
-useEffect(() => {
-  fetch("http://localhost:3000/categoria")
-    .then((res) => res.json())
-    .then((datos) => {
-      console.log(datos);
-      setCategoria(datos);
-    })
-    .catch((error) => {
-      console.log(error);
-      alert("Ocurrio un problema con la conexión");
-    });
-}, setCategoria);
-
-function Platillos() {
-  navigation.navigate("ListarPlatillos");
-}
-  return (
-    <View style={estilos.container}>
-      <Text style={estilos.texto1}>Categorias</Text>
-      <ScrollView>
-        {categoria.map((p) => (
-          <TouchableHighlight key={p.CategoriaId} onPress={() => Platillos()}>
-            <View>
-              <Text style={estilos.texto}> {p.Nombre}</Text>
-              <Text style={estilos.texto}> {p.Fecha}</Text>
-              <AntDesign name="right" size={23} color="#0a84ff" />
-            </View>
-          </TouchableHighlight>
-        ))}
-      </ScrollView>
-    </View>
-  );
-}
-
-function ListadoPlatillos() {
-
-  return (
-    <View style={estilos.container}>
-      <Text style={estilos.texto1}>Listado de platillos</Text>
-    </View>
-  );
-}
-
-function Categoria() {
-  const [Nombre, setNombre] = useState("");
-  function AgregarCat()
-  {
-    fetch("http://localhost:3000/categoriapost", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        Nombre: Nombre,
-      }),
-    })
-      .then((res) => res.text())
-      .then((res) => {
-        console.log(res);
-        alert('Se ha creado una nueva categoria');
-        //window.location.reload();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-  return (
-    <View style={estilos.container}>
-      <Text style={estilos.texto1}>
-        Nueva categoria
-      </Text>
-      <TextInput
-        placeholder="Nombre de la categoria"
-        onChangeText={(n) => setNombre(n)}
-        style={estilos.input}
-      ></TextInput>
-      <Button onPress={() => AgregarCat()} title="Añadir" />
-    </View>
-  );
-}
-function PantallaDos() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name="Crear Usuario" component={RegistroScreen} />
-      <Tab.Screen name="Ver Categorias" component={listado} />
-        <Tab.Screen name="Crear Categoria" component={Categoria} />
-        <Tab.Screen name="Crear Platillos" component={listado} />
-    </Tab.Navigator>
-  );
-}
 export default function App() {
+  const [categoria, setCategoria] = useState([]);
+  useEffect(() => {
+    fetch("http://localhost:3000/categoria")
+      .then((res) => res.json())
+      .then((datos) => {
+        console.log(datos);
+        setCategoria(datos);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("Ocurrio un problema con la conexión");
+      });
+  }, setCategoria);
+  
+  function PostScreen({ navigation }) {
+    const [Nombre, setNombre] = useState("");
+    const [Password, setPassword] = useState("");
+    function Login() {
+      //AGREGO EN BASE DE DATOS
+      fetch("http://localhost:3000/user", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          Nombre: Nombre,
+          Password: Password,
+        }),
+      })
+        .then((res) => res.text())
+        .then((res) => {
+          console.log(res);
+          //console.log(typeof(res),res.length);
+          if (res.length == 2) {
+            alert("Usuario o contraseña no existen");
+          } else {
+            var a =JSON.parse(res);
+            var id =a[0].UsuarioId
+            localStorage.setItem('id',id);
+            //alert("Te haz logueado exitosamente");
+            navigation.navigate("Bienvenidos");
+          }
+  
+          //window.location.reload();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+    return (
+      <View style={estilos.container}>
+        <Text style={estilos.texto1}>Login</Text>
+        <TextInput
+          placeholder="Username"
+          onChangeText={(n) => setNombre(n)}
+          style={estilos.input}
+        ></TextInput>
+        <TextInput
+          placeholder="Password"
+          onChangeText={(a) => setPassword(a)}
+          style={estilos.input}
+        ></TextInput>
+        <Button onPress={() => Login()} title="Logueo" />
+      </View>
+    );
+  }
+  const Tab = createBottomTabNavigator();
+  const Stack = createStackNavigator();
+  function RegistroScreen() {
+    const [Nombre, setNombre] = useState("");
+    const [Password, setPassword] = useState("");
+    function Registro() {
+      //AGREGO EN BASE DE DATOS
+      fetch("http://localhost:3000/registro", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          Nombre: Nombre,
+          Password: Password,
+        }),
+      })
+        .then((res) => res.text())
+        .then((res) => {
+          console.log(res);
+          alert("Usuario agregado exitosamente");
+          //window.location.reload();
+        })
+        .catch((error) => console.logl(error));
+    }
+    return (
+      <View style={estilos.container}>
+        <Text style={estilos.texto1}>Registro</Text>
+        <Text style={estilos.texto1}>
+          Unicamente cree su usuario y contraseña
+        </Text>
+        <TextInput
+          placeholder="Username"
+          onChangeText={(n) => setNombre(n)}
+          style={estilos.input}
+        ></TextInput>
+        <TextInput
+          placeholder="Password"
+          onChangeText={(a) => setPassword(a)}
+          style={estilos.input}
+        ></TextInput>
+        <Button onPress={() => Registro()} title="Registro" />
+      </View>
+    );
+  }
+  
+  
+  function listado({navigation}) {
+ 
+  function Platillos() {
+    navigation.navigate("ListarPlatillos");
+  }
+    return (
+      <View style={estilos.container}>
+        <Text style={estilos.texto1}>Categorias</Text>
+        <ScrollView>
+          {categoria.map((p) => (
+            <TouchableHighlight key={p.CategoriaId} onPress={() => Platillos()}>
+              <View>
+                <Text style={estilos.texto}> {p.Nombre}</Text>
+                <Text style={estilos.texto}> {p.Fecha}</Text>
+                <AntDesign name="right" size={23} color="#0a84ff" />
+              </View>
+            </TouchableHighlight>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
+  
+  function ListadoPlatillos() {
+  
+    return (
+      <View style={estilos.container}>
+        <Text style={estilos.texto1}>Listado de platillos</Text>
+      </View>
+    );
+  }
+  
+  function Categoria() {
+    const [Nombre, setNombre] = useState("");
+    function AgregarCat()
+    {
+      fetch("http://localhost:3000/categoriapost", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          Nombre: Nombre,
+        }),
+      })
+        .then((res) => res.text())
+        .then((res) => {
+          console.log(res);
+          alert('Se ha creado una nueva categoria');
+          fetch("http://localhost:3000/categoria")
+          .then((res) => res.json())
+          .then((datos) => {
+            console.log(datos);
+            setCategoria(datos);
+          })
+          .catch((error) => {
+            console.log(error);
+            alert("Ocurrio un problema con la conexión");
+          });
+          //window.location.reload();
+        })
+        .catch((error) => console.log(error));
+        //
+       
+    }
+    return (
+      <View style={estilos.container}>
+        <Text style={estilos.texto1}>
+          Nueva categoria
+        </Text>
+        <TextInput
+          placeholder="Nombre de la categoria"
+          onChangeText={(n) => setNombre(n)}
+          style={estilos.input}
+        ></TextInput>
+        <Button onPress={() => AgregarCat()} title="Añadir" />
+      </View>
+    );
+  }
+  function PantallaDos() {
+    return (
+      <Tab.Navigator>
+        <Tab.Screen name="Crear Usuario" component={RegistroScreen} />
+        <Tab.Screen name="Ver Categorias" component={listado} />
+          <Tab.Screen name="Crear Categoria" component={Categoria} />
+          <Tab.Screen name="Crear Platillos" component={listado} />
+      </Tab.Navigator>
+    );
+  }
   return (
     <NavigationContainer>
       <Stack.Navigator>
