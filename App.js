@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
   TouchableHighlight,
+  TouchableOpacity
 } from "react-native";
 import "react-native-gesture-handler";
 import { NavigationContainer, StackActions } from "@react-navigation/native";
@@ -21,6 +22,7 @@ localStorage.clear();
 
 export default function App() {
   const [categoria, setCategoria] = useState([]);
+  const [platillo, setPlatillo] = useState([]);
   useEffect(() => {
     fetch("http://localhost:3000/categoria")
       .then((res) => res.json())
@@ -80,7 +82,9 @@ export default function App() {
           onChangeText={(a) => setPassword(a)}
           style={estilos.input}
         ></TextInput>
-        <Button onPress={() => Login()} title="Logueo" />
+        <TouchableOpacity onPress={() => Login()} style={estilos.button}>
+          <Text style={estilos.texto}>Iniciar sesión</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -123,7 +127,9 @@ export default function App() {
           onChangeText={(a) => setPassword(a)}
           style={estilos.input}
         ></TextInput>
-        <Button onPress={() => Registro()} title="Registro" />
+       <TouchableOpacity onPress={() => Registro()} style={estilos.button}>
+          <Text style={estilos.texto}>Crear</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -131,15 +137,15 @@ export default function App() {
   
   function listado({navigation}) {
  
-  function Platillos() {
-    navigation.navigate("ListarPlatillos");
+  function Platillos(plato) {
+    navigation.navigate("ListarPlatillos",{plato});
   }
     return (
       <View style={estilos.container}>
         <Text style={estilos.texto1}>Categorias</Text>
         <ScrollView>
           {categoria.map((p) => (
-            <TouchableHighlight key={p.CategoriaId} onPress={() => Platillos()}>
+            <TouchableHighlight key={p.CategoriaId} onPress={() => Platillos(p)} style={estilos.cuadro}>
               <View>
                 <Text style={estilos.texto}> {p.Nombre}</Text>
                 <Text style={estilos.texto}> {p.Fecha}</Text>
@@ -152,15 +158,95 @@ export default function App() {
     );
   }
   
-  function ListadoPlatillos() {
-  
+  function ListadoPlatillos({navigation,route}) {
+    console.log(route.params);
+    let id=route.params.plato.CategoriaId
+    let obj = route.params;
+    const [platillo, setPlatillo] = useState([]);
+    useEffect(() => {
+      fetch("http://localhost:3000/listplatillos/"+id)
+        .then((res) => res.json())
+        .then((datos) => {
+          console.log(datos);
+          setPlatillo(datos);
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Ocurrio un problema con la conexión");
+        });
+    }, setCategoria);
+    function AddPlatillos() {
+      navigation.navigate("AgregarPlatillos",{obj});
+    }
     return (
       <View style={estilos.container}>
+        <TouchableOpacity onPress={() => AddPlatillos()} style={estilos.button}>
+          <Text style={estilos.texto}>Agregar platillo</Text>
+        </TouchableOpacity>
         <Text style={estilos.texto1}>Listado de platillos</Text>
+        <ScrollView>
+          {platillo.map((p) => (
+            <TouchableHighlight key={p.PlatilloId} style={estilos.cuadro}>
+              <View>
+                <Text style={estilos.texto}>Platillo: {p.Nombre}</Text>
+                <Text style={estilos.texto}>Categoria: {p.Categoria}</Text>
+                <Text style={estilos.texto}>Descripcion: {p.Descripcion}</Text>
+                <Text style={estilos.texto}>Usuario: {p.Usuario}</Text>
+                <AntDesign name="right" size={23} color="#0a84ff" />
+              </View>
+            </TouchableHighlight>
+          ))}
+        </ScrollView>
       </View>
     );
   }
-  
+  function AgregarPlatillos({navigation,route}) {
+    const [Nombre, setNombre] = useState("");
+    const [Descripcion, setDescripcion] = useState("");
+    //const [Descripcion, setDescripcion] = useState("");
+    var cate=route.params.obj.plato.CategoriaId
+    function AgregarCat()
+    {
+      fetch("http://localhost:3000/platillo", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          Nombre: Nombre,
+          CategoriaId:route.params.obj.plato.CategoriaId,
+          Descripcion:Descripcion,
+          UserId: localStorage.getItem('id')
+        }),
+      })
+        .then((res) => res.text())
+        .then((res) => {
+          console.log(res);
+          alert('Se ha creado un nuevo platillo');
+          navigation.navigate("Ver Categorias");
+          //window.location.reload();
+        })
+        .catch((error) => console.log(error));
+        //
+       
+    }
+    return (
+      <View style={estilos.container}>
+        <Text style={estilos.texto1}>Agregar de platillos</Text>
+        <TextInput
+          placeholder="Nombre del platillo"
+          onChangeText={(n) => setNombre(n)}
+          style={estilos.input}
+        ></TextInput>
+                <TextInput
+          placeholder="Descripcion"
+          onChangeText={(n) => setDescripcion(n)}
+          style={estilos.input}
+        ></TextInput>
+        <TouchableOpacity onPress={() => AgregarCat()} style={estilos.button}>
+          <Text style={estilos.texto}>Agregar</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
   function Categoria() {
     const [Nombre, setNombre] = useState("");
     function AgregarCat()
@@ -202,7 +288,9 @@ export default function App() {
           onChangeText={(n) => setNombre(n)}
           style={estilos.input}
         ></TextInput>
-        <Button onPress={() => AgregarCat()} title="Añadir" />
+        <TouchableOpacity onPress={() => AgregarCat()} style={estilos.button}>
+          <Text style={estilos.texto}>Crear categoria</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -212,7 +300,6 @@ export default function App() {
         <Tab.Screen name="Crear Usuario" component={RegistroScreen} />
         <Tab.Screen name="Ver Categorias" component={listado} />
           <Tab.Screen name="Crear Categoria" component={Categoria} />
-          <Tab.Screen name="Crear Platillos" component={listado} />
       </Tab.Navigator>
     );
   }
@@ -222,6 +309,7 @@ export default function App() {
         <Stack.Screen name="Login" component={PostScreen} />
         <Stack.Screen name="Bienvenidos" component={PantallaDos} />
         <Stack.Screen name="ListarPlatillos" component={ListadoPlatillos} />
+        <Stack.Screen name="AgregarPlatillos" component={AgregarPlatillos} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -233,9 +321,9 @@ const estilos = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "rgba(76, 175, 80, 0.3)",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#9de1fe',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   texto1: {
     fontSize: 30,
@@ -243,8 +331,8 @@ const estilos = StyleSheet.create({
     fontFamily: "Comic Sans MS, Comic Sans, cursive",
   },
   texto: {
-    fontSize: 35,
-    color: "blue",
+    fontSize: 30,
+    color: "white",
     fontFamily: "Comic Sans MS, Comic Sans, cursive",
   },
   input: {
@@ -259,6 +347,17 @@ const estilos = StyleSheet.create({
     fontSize: 25,
   },
   button: {
+    marginTop:"1%",
+    backgroundColor: "#2196F3",
+    paddingVertical: 12,
+    width: 250,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#dcf8c6",
+    alignItems:'center',
+    justifyContent: 'center',
+  },
+  cuadro:{
     borderWidth: 10,
     marginBottom: 30,
     width: 300,
