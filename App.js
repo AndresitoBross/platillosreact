@@ -59,7 +59,7 @@ export default function App() {
             var a =JSON.parse(res);
             var id =a[0].UsuarioId
             localStorage.setItem('id',id);
-            //alert("Te haz logueado exitosamente");
+            alert("Te haz logueado exitosamente");
             navigation.navigate("Bienvenidos");
           }
   
@@ -149,7 +149,7 @@ export default function App() {
               <View>
                 <Text style={estilos.texto}> {p.Nombre}</Text>
                 <Text style={estilos.texto}> {p.Fecha}</Text>
-                <AntDesign name="right" size={23} color="#0a84ff" />
+                <AntDesign name="right" size={23} color="#FFF" />
               </View>
             </TouchableHighlight>
           ))}
@@ -297,16 +297,23 @@ export default function App() {
   function PantallaDos() {
     return (
       <Tab.Navigator>
-        <Tab.Screen name="Crear Usuario" component={RegistroScreen} />
         <Tab.Screen name="Ver Categorias" component={listado} />
           <Tab.Screen name="Crear Categoria" component={Categoria} />
+      </Tab.Navigator>
+    );
+  }
+  function PantallaPrincipal() {
+    return (
+      <Tab.Navigator>
+        <Tab.Screen name="Login" component={PostScreen} />
+        <Tab.Screen name="Crear Usuario" component={RegistroScreen} />
       </Tab.Navigator>
     );
   }
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Login" component={PostScreen} />
+        <Stack.Screen name="Login" component={PantallaPrincipal} />
         <Stack.Screen name="Bienvenidos" component={PantallaDos} />
         <Stack.Screen name="ListarPlatillos" component={ListadoPlatillos} />
         <Stack.Screen name="AgregarPlatillos" component={AgregarPlatillos} />
